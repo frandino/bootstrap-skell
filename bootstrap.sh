@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 echo "Setting up your environment..."
 
@@ -9,30 +9,30 @@ reset="\033[0m"
 
 error=0
 function test_dependency() {
-  if [ ! $(which $1) ]; then
-    echo "$red  ✖  You need to install $2.\c"
+  if [ ! $(which $1 2> /dev/null) ]; then
+    echo -e "$red  ✖  You need to install $2.\c"
     if [ -n "$3" ]; then
-      echo "$white\n     $3\n"
+      echo -e "$white\n     $3\n"
     else
       echo " If you use Homebrew, you can run:"
-      echo "$white     brew install $2\n"
+      echo -e "$white     brew install $2\n"
     fi
     error=1
   else
-    echo "$green  ✔  $2 is already installed."
+    echo -e "$green  ✔  $2 is already installed."
   fi
-  echo "$reset\c"
+  echo -e "$reset\c"
 }
 
 #
-# Check for Ruby Enterprise Edition
+# Check for Ruby 1.9.3
 #
-rbversion=$(ruby -v | grep -c "Ruby Enterprise Edition")
+rbversion=$(ruby -v | grep -c "1.9.3")
 if [ $rbversion -ne 1 ]; then
-  echo "$red  ✖  Ruby Enterprise Edition is not installed. Please install it.$reset"
+  echo -e "$red  ✖  Ruby 1.9.3 is not installed. Please install it.$reset"
   error=1
 else
-  echo "$green  ✔  Ruby Enterprise Edition is already installed.$reset"
+  echo -e "$green  ✔  Ruby 1.9.3 is already installed.$reset"
 fi
 
 test_dependency "bundle" "Bundler" "gem install bundler"
@@ -40,5 +40,10 @@ test_dependency "bundle" "Bundler" "gem install bundler"
 if [ $error -ne 0 ]; then
   exit 1
 fi
+
+echo "Installing gems"
+bundle install --quiet --binstubs=b --path vendor &&
+cp config/database.sample.yml config/database.yml &&
+b/rake db:setup &&
 
 echo "Done"
