@@ -2,43 +2,55 @@
 
 echo "Setting up your environment..."
 
-red="\033[31m"
-green="\033[0;32m"
-white="\033[0;37m"
-reset="\033[0m"
-
-error=0
-function test_dependency() {
-  if [ ! $(which $1 2> /dev/null) ]; then
-    echo -e "$red  ✖  You need to install $2.\c"
-    if [ -n "$3" ]; then
-      echo -e "$white\n     $3\n"
-    else
-      echo " If you use Homebrew, you can run:"
-      echo -e "$white     brew install $2\n"
-    fi
-    error=1
-  else
-    echo -e "$green  ✔  $2 is already installed."
-  fi
-  echo -e "$reset\c"
+red() {
+  echo -e "\033[31m $1\033[0m"
 }
 
-#
-# Check for Ruby 1.9.3
-#
-rbversion=$(ruby -v | grep -c "1.9.3")
-if [ $rbversion -ne 1 ]; then
-  echo -e "$red  ✖  Ruby 1.9.3 is not installed. Please install it.$reset"
-  error=1
-else
-  echo -e "$green  ✔  Ruby 1.9.3 is already installed.$reset"
-fi
+green() {
+  echo -e "\033[0;32m$1\033[0m"
+}
 
-test_dependency "bundle" "Bundler" "gem install bundler"
+white() {
+  echo -e "\033[0;37m$1\033[0m"
+}
 
-if [ $error -ne 0 ]; then
-  exit 1
+command_exists() {
+  command -v "$1" &>/dev/null
+}
+
+test_dependency() {
+  if command_exists "$1"; then
+    green "  ✔  $2 is already installed."
+  else
+    exec >&2
+    red "   ✖  You need to install $2.\c"
+    if [[ -n "$3" ]]; then
+      white "\n     $3\n"
+    else
+      echo " If you use Homebrew, you can run:"
+      white "     brew install $2\n"
+    fi
+    return 1
+  fi
+}
+
+check_ruby() {
+  if ruby -v | grep -q "$1"; then
+    green "  ✔  Ruby $1 is already installed."
+  else
+    red "  ✖  Ruby 1.9.3 is not installed. Please install it."
+    return 1
+  fi
+}
+
+(
+  set -e
+  test_dependency "bundle" "Bundler" "gem install bundler"
+  check_ruby "1.9.3"
+)
+
+if (( $? != 0 )); then
+  exit $?
 fi
 
 echo "Installing gems"
