@@ -54,7 +54,11 @@ if (( $? != 0 )); then
 fi
 
 echo "Installing gems"
-bundle install --quiet --binstubs=b --path vendor &&
+bundle config --local path vendor > /dev/null 2>&1
+bundle config --local bin b > /dev/null 2>&1
+bundle config --local disable_shared_gems 1 > /dev/null 2>&1
+bundle check > /dev/null 2>&1 || bundle install --quiet
+
 cp config/database.sample.yml config/database.yml &&
 b/rake db:setup &&
 
