@@ -55,7 +55,7 @@ fi
 
 echo "Installing gems"
 bundle config --local path vendor &> /dev/null
-bundle config --local bin b &> /dev/null
+bundle config --local bin bin &> /dev/null
 bundle config --local disable_shared_gems 1 &> /dev/null
 bundle check &> /dev/null || bundle install --quiet
 
