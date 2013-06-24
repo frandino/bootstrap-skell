@@ -38,7 +38,7 @@ check_ruby() {
   if ruby -v | grep -q "$1"; then
     green "  ✔  Ruby $1 is already installed."
   else
-    red "  ✖  Ruby 1.9.3 is not installed. Please install it."
+    red "  ✖  Ruby $1 is not installed. Please install it."
     return 1
   fi
 }
