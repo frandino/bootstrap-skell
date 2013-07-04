@@ -56,7 +56,10 @@ fi
 echo "Installing gems"
 bundle check &> /dev/null || bundle install --quiet
 
-cp config/database.sample.yml config/database.yml &&
+for sample in config/*.sample; do
+  cp $sample ${sample%.*}
+done
+
 bundle exec rake db:setup &&
 
 echo "Done"
