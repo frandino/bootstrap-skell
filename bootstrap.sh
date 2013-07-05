@@ -56,10 +56,12 @@ fi
 echo "Installing gems"
 bundle check &> /dev/null || bundle install --quiet
 
+echo "Copying sample files"
 for sample in $(find config -type f -maxdepth 1 -name '*.sample'); do
   cp "$sample" "${sample%.*}"
 done
 
+echo "Setup development database"
 bundle exec rake db:setup &&
 
 echo "Done"
