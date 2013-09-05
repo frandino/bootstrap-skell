@@ -43,6 +43,16 @@ check_ruby() {
   fi
 }
 
+copy_sample() {
+  local config_file="${1%.*}"
+
+  if [[ ! -f "$config_file" ]]; then
+    cp "$1" "$config_file"
+  fi
+
+  echo "    $1"
+}
+
 (
   set -e
   test_dependency "bundle" "Bundler" "gem install bundler"
@@ -58,10 +68,7 @@ bundle check &> /dev/null || bundle install --quiet
 
 echo "Copying sample files"
 for sample in $(find config -type f -maxdepth 1 -name '*.sample'); do
-  if [[ ! -f "${sample%.*}" ]]; then
-    cp "$sample" "${sample%.*}"
-  fi
-  echo "    $sample"
+  copy_sample "$sample"
 done
 
 echo "Setup development database"
