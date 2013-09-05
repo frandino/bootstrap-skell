@@ -58,7 +58,7 @@ bundle check &> /dev/null || bundle install --quiet
 
 echo "Copying sample files"
 for sample in $(find config -type f -maxdepth 1 -name '*.sample'); do
-  if [[ -f "$sample" ]]; then
+  if [[ ! -f "${sample%.*}" ]]; then
     cp "$sample" "${sample%.*}"
   fi
   echo "    $sample"
